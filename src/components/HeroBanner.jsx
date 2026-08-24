@@ -1,0 +1,75 @@
+import React, { useState, useEffect } from 'react';
+import { banners } from '../data/banners';
+import { useShop } from '../context/ShopContext';
+import { ChevronLeft, ChevronRight, ArrowRight, Zap } from 'lucide-react';
+
+export const HeroBanner = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const { setSelectedCategory } = useShop();
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % banners.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const banner = banners[currentSlide];
+
+  return (
+    <section className="hero-section">
+      <div 
+        className="hero-card"
+        style={{
+          backgroundImage: `url(${banner.image})`,
+          position: 'relative'
+        }}
+      >
+        <div 
+          className="hero-overlay" 
+          style={{
+            background: `linear-gradient(90deg, rgba(11, 15, 23, 0.95) 0%, rgba(11, 15, 23, 0.75) 50%, rgba(11, 15, 23, 0.3) 100%)`
+          }}
+        />
+
+        <div className="hero-content">
+          <div className="hero-badge">
+            <Zap size={14} fill="#FFE600" />
+            {banner.badge}
+          </div>
+          <h1 className="hero-title">{banner.title}</h1>
+          <p className="hero-subtitle">{banner.subtitle}</p>
+
+          <div className="hero-tags">
+            {banner.tags.map((tag, idx) => (
+              <span key={idx} className="hero-tag-item">{tag}</span>
+            ))}
+          </div>
+
+          <button 
+            className="hero-cta"
+            onClick={() => {
+              setSelectedCategory(banner.categoryTarget);
+              const el = document.getElementById('product-feed-section');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }}
+          >
+            <span>{banner.ctaText}</span>
+            <ArrowRight size={18} />
+          </button>
+        </div>
+
+        {/* Indicators */}
+        <div className="hero-indicators">
+          {banners.map((_, idx) => (
+            <div
+              key={idx}
+              className={`hero-indicator ${idx === currentSlide ? 'active' : ''}`}
+              onClick={() => setCurrentSlide(idx)}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
