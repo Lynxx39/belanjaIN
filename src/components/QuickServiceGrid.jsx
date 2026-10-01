@@ -1,6 +1,7 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { quickServices } from '../data/quickServices';
-import { useShop } from '../context/ShopContext';
+import { useUi } from '../context/UiContext';
 import {
   Icon3DFlashSale,
   Icon3DOngkir,
@@ -9,7 +10,7 @@ import {
   Icon3DVoucher,
   Icon3DKoin,
   Icon3DPay,
-  Icon3DPulsa
+  Icon3DPulsa,
 } from './ShopeeIcons';
 
 const iconMap = {
@@ -20,42 +21,27 @@ const iconMap = {
   Ticket: Icon3DVoucher,
   Coins: Icon3DKoin,
   Wallet: Icon3DPay,
-  Zap: Icon3DPulsa
+  Zap: Icon3DPulsa,
 };
 
 export const QuickServiceGrid = () => {
-  const {
-    setOnlyFreeShipping,
-    setIsCartOpen,
-    showToast,
-    setOnlyDiscount
-  } = useShop();
+  const navigate = useNavigate();
+  const { showToast } = useUi();
 
   const handleServiceClick = (service) => {
-    if (service.targetId) {
-      const el = document.getElementById(service.targetId);
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    } else if (service.filter === 'freeShipping') {
-      setOnlyFreeShipping((prev) => !prev);
-      const el = document.getElementById('product-feed-section');
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-      showToast('Filter Gratis Ongkir', 'Menampilkan produk dengan Gratis Ongkir XTRA', 'info');
-    } else if (service.action === 'voucher') {
-      setIsCartOpen(true);
+    if (service.id === 'flash-sale') return navigate('/cari?q=flash%20sale');
+    if (service.id === 'ongkir') return navigate('/kategori/all?freeShipping=1');
+    if (service.id === 'mall') return navigate('/kategori/all?official=1');
+    if (service.id === 'live') return navigate('/#live');
+    if (service.action === 'voucher') {
+      navigate('/keranjang');
       showToast('Voucher Belanja', 'Klaim voucher HEMAT50 atau BELANJABARU di keranjang!', 'info');
-    } else if (service.action === 'koin') {
-      showToast('Koin belanjaIN', 'Kamu mendapatkan +500 Koin belanjaIN hari ini! 🪙', 'success');
-    } else if (service.action === 'pay') {
-      showToast('belanjaPay Aktif', 'Saldo Anda: Rp 1.500.000 (Siap digunakan untuk checkout)', 'success');
-    } else if (service.action === 'pulsa') {
-      showToast('Layanan Pulsa & Tagihan', 'Fitur Top-Up & Pembayaran Tagihan aktif', 'info');
-    } else {
-      // "Official Mall": no dedicated filter, surface the discount feed instead
-      setOnlyDiscount((prev) => !prev);
-      const el = document.getElementById('product-feed-section');
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-      showToast('Official Mall', 'Menampilkan produk diskon pilihan mall', 'info');
+      return;
     }
+    if (service.action === 'koin') return showToast('Koin belanjaIN', 'Kamu mendapatkan +500 Koin belanjaIN hari ini!', 'success');
+    if (service.action === 'pay') return showToast('belanjaPay Aktif', 'Saldo Anda: Rp 1.500.000 (siap checkout)', 'success');
+    if (service.action === 'pulsa') return showToast('Pulsa & Tagihan', 'Fitur Top-Up & Pembayaran Tagihan aktif', 'info');
+    navigate('/kategori/all');
   };
 
   return (
@@ -63,7 +49,6 @@ export const QuickServiceGrid = () => {
       <div className="quick-services-scroll">
         {quickServices.map((srv) => {
           const IconComp = iconMap[srv.icon] || Icon3DFlashSale;
-
           return (
             <div
               key={srv.id}
@@ -78,22 +63,10 @@ export const QuickServiceGrid = () => {
                 }
               }}
             >
-              <div
-                className="quick-service-icon-wrap"
-                style={{
-                  background: 'var(--bg-surface-elevated)',
-                  border: '1px solid var(--border-subtle)',
-                  boxShadow: 'var(--shadow-sm)'
-                }}
-              >
+              <div className="quick-service-icon-wrap">
                 <IconComp size={30} />
                 {srv.badge && (
-                  <span
-                    className="quick-service-badge"
-                    style={{
-                      background: srv.badge === 'LIVE' ? '#EF4444' : srv.color
-                    }}
-                  >
+                  <span className="quick-service-badge" style={{ background: srv.badge === 'LIVE' ? '#EF4444' : srv.color }}>
                     {srv.badge}
                   </span>
                 )}

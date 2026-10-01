@@ -1,6 +1,6 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { categories } from '../data/categories';
-import { useShop } from '../context/ShopContext';
 import {
   CategoryIconAll,
   CategoryIconGadget,
@@ -11,7 +11,7 @@ import {
   CategoryIconKecantikan,
   CategoryIconSepatu,
   CategoryIconAksesoris,
-  CategoryIconHome
+  CategoryIconHome,
 } from './ShopeeIcons';
 
 const iconMap = {
@@ -24,32 +24,25 @@ const iconMap = {
   kecantikan: CategoryIconKecantikan,
   sepatu: CategoryIconSepatu,
   aksesoris: CategoryIconAksesoris,
-  home: CategoryIconHome
+  home: CategoryIconHome,
 };
 
-export const CategoryPills = () => {
-  const { selectedCategory, setSelectedCategory } = useShop();
+export const CategoryPills = ({ activeId = 'all' }) => {
+  const navigate = useNavigate();
 
   return (
     <section className="category-nav-section">
       <div className="category-scroll-list">
         {categories.map((cat) => {
           const IconComp = iconMap[cat.id] || CategoryIconAll;
-          const isActive = selectedCategory === cat.id;
-
+          const isActive = activeId === cat.id;
           return (
             <button
               key={cat.id}
               className={`category-pill ${isActive ? 'active' : ''}`}
-              onClick={() => setSelectedCategory(cat.id)}
+              onClick={() => navigate(`/kategori/${cat.id}`)}
             >
-              <div 
-                className="category-icon-box"
-                style={{
-                  background: isActive ? 'rgba(255, 255, 255, 0.25)' : 'var(--bg-surface-elevated)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)'
-                }}
-              >
+              <div className="category-icon-box" style={{ background: isActive ? 'rgba(255,255,255,0.25)' : 'var(--bg-surface-elevated)' }}>
                 <IconComp size={18} />
               </div>
               <span className="category-label">{cat.name}</span>

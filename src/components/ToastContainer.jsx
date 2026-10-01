@@ -1,22 +1,22 @@
 import React from 'react';
-import { useShop } from '../context/ShopContext';
+import { useUi } from '../context/UiContext';
 import { CheckCircle2, AlertCircle, Info, AlertTriangle } from 'lucide-react';
 
 export const ToastContainer = () => {
-  const { toasts } = useShop();
+  const { toasts } = useUi();
 
   if (toasts.length === 0) return null;
 
   const getIcon = (type) => {
     switch (type) {
       case 'success':
-        return <CheckCircle2 size={18} color="#10B981" />;
+        return <CheckCircle2 size={18} color="#26AA99" />;
       case 'error':
         return <AlertCircle size={18} color="#EF4444" />;
       case 'warning':
         return <AlertTriangle size={18} color="#F59E0B" />;
       default:
-        return <Info size={18} color="#3B82F6" />;
+        return <Info size={18} color="#2673DD" />;
     }
   };
 

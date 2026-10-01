@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { banners } from '../data/banners';
-import { useShop } from '../context/ShopContext';
 import { ArrowRight, Zap } from 'lucide-react';
 
 export const HeroBanner = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const { setSelectedCategory } = useShop();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -18,23 +18,15 @@ export const HeroBanner = () => {
 
   return (
     <section className="hero-section">
-      <div 
-        className="hero-card"
-        style={{
-          backgroundImage: `url(${banner.image})`,
-          position: 'relative'
-        }}
-      >
-        <div 
-          className="hero-overlay" 
-          style={{
-            background: `linear-gradient(90deg, rgba(11, 15, 23, 0.95) 0%, rgba(11, 15, 23, 0.75) 50%, rgba(11, 15, 23, 0.3) 100%)`
-          }}
+      <div className="hero-card" style={{ backgroundImage: `url(${banner.image})`, position: 'relative' }}>
+        <div
+          className="hero-overlay"
+          style={{ background: 'linear-gradient(90deg, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.45) 50%, rgba(0,0,0,0.1) 100%)' }}
         />
 
         <div className="hero-content">
           <div className="hero-badge">
-            <Zap size={14} fill="#FFE600" />
+            <Zap size={14} fill="#FFD839" />
             {banner.badge}
           </div>
           <h1 className="hero-title">{banner.title}</h1>
@@ -46,20 +38,12 @@ export const HeroBanner = () => {
             ))}
           </div>
 
-          <button 
-            className="hero-cta"
-            onClick={() => {
-              setSelectedCategory(banner.categoryTarget);
-              const el = document.getElementById('product-feed-section');
-              if (el) el.scrollIntoView({ behavior: 'smooth' });
-            }}
-          >
+          <button className="hero-cta" onClick={() => navigate(`/kategori/${banner.categoryTarget}`)}>
             <span>{banner.ctaText}</span>
             <ArrowRight size={18} />
           </button>
         </div>
 
-        {/* Indicators */}
         <div className="hero-indicators">
           {banners.map((_, idx) => (
             <div

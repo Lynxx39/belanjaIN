@@ -1,4 +1,6 @@
-export const products = [
+import { getStore, productStoreMap } from './stores';
+
+const rawProducts = [
   {
     id: 1,
     name: 'Smartwatch Pro Ultra AMOLED Display GPS Health Tracker Anti Air IP68',
@@ -313,3 +315,8 @@ export const products = [
     cashback: '5%'
   }
 ];
+
+export const products = rawProducts.map((p) => {
+  const storeId = productStoreMap[p.id];
+  return { ...p, storeId, store: getStore(storeId) };
+});

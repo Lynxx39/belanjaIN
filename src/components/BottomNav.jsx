@@ -1,59 +1,29 @@
 import React from 'react';
-import { useShop } from '../context/ShopContext';
-import { Home, Flame, Radio, Heart, ShoppingBag } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
+import { Home, LayoutGrid, Radio, ShoppingBag, User } from 'lucide-react';
 
 export const BottomNav = () => {
-  const {
-    cart,
-    wishlist,
-    setIsCartOpen,
-    setIsWishlistOpen,
-    setSelectedCategory,
-    setSearchQuery
-  } = useShop();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { totalCartCount } = useCart();
 
-  const totalCartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-
-  const handleGoHome = () => {
-    setSelectedCategory('all');
-    setSearchQuery('');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleGoFlashSale = () => {
-    const el = document.getElementById('flash-sale-section');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const handleGoLive = () => {
-    const el = document.getElementById('live-stream-section');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+  const go = (to) => () => navigate(to);
+  const isActive = (to) => (to === '/' ? location.pathname === '/' : location.pathname.startsWith(to));
 
   return (
     <nav className="mobile-bottom-nav">
-      {/* Home Tab */}
-      <button className="bottom-nav-item" onClick={handleGoHome}>
-        <div className="bottom-nav-icon-wrap">
-          <Home size={20} />
-        </div>
+      <button className={`bottom-nav-item ${isActive('/') ? 'active' : ''}`} onClick={go('/')}>
+        <div className="bottom-nav-icon-wrap"><Home size={20} /></div>
         <span className="bottom-nav-label">Beranda</span>
       </button>
 
-      {/* Flash Sale Tab */}
-      <button className="bottom-nav-item" onClick={handleGoFlashSale}>
-        <div className="bottom-nav-icon-wrap">
-          <Flame size={20} color="#FF4B2B" />
-        </div>
-        <span className="bottom-nav-label">Flash Sale</span>
+      <button className={`bottom-nav-item ${isActive('/kategori') ? 'active' : ''}`} onClick={go('/kategori/all')}>
+        <div className="bottom-nav-icon-wrap"><LayoutGrid size={20} /></div>
+        <span className="bottom-nav-label">Kategori</span>
       </button>
 
-      {/* Live Tab */}
-      <button className="bottom-nav-item" onClick={handleGoLive}>
+      <button className="bottom-nav-item" onClick={() => navigate('/#live')}>
         <div className="bottom-nav-icon-wrap live-pulse-wrap">
           <Radio size={20} color="#EF4444" />
           <span className="live-dot" />
@@ -61,26 +31,17 @@ export const BottomNav = () => {
         <span className="bottom-nav-label">Live</span>
       </button>
 
-      {/* Wishlist Tab */}
-      <button className="bottom-nav-item" onClick={() => setIsWishlistOpen(true)}>
-        <div className="bottom-nav-icon-wrap">
-          <Heart size={20} />
-          {wishlist.length > 0 && (
-            <span className="bottom-nav-badge">{wishlist.length}</span>
-          )}
-        </div>
-        <span className="bottom-nav-label">Favorit</span>
+      <button className={`bottom-nav-item ${isActive('/pesanan') ? 'active' : ''}`} onClick={go('/pesanan')}>
+        <div className="bottom-nav-icon-wrap"><ShoppingBag size={20} /></div>
+        <span className="bottom-nav-label">Pesanan</span>
       </button>
 
-      {/* Cart Tab */}
-      <button className="bottom-nav-item" onClick={() => setIsCartOpen(true)}>
+      <button className={`bottom-nav-item ${isActive('/akun') ? 'active' : ''}`} onClick={go('/akun')}>
         <div className="bottom-nav-icon-wrap">
-          <ShoppingBag size={20} />
-          {totalCartCount > 0 && (
-            <span className="bottom-nav-badge">{totalCartCount}</span>
-          )}
+          <User size={20} />
+          {totalCartCount > 0 && <span className="bottom-nav-badge">{totalCartCount}</span>}
         </div>
-        <span className="bottom-nav-label">Keranjang</span>
+        <span className="bottom-nav-label">Akun</span>
       </button>
     </nav>
   );

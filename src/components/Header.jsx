@@ -1,38 +1,36 @@
-import React from 'react';
-import { useShop } from '../context/ShopContext';
-import { 
-  ShoppingBag, 
-  Search, 
-  Heart, 
-  ShoppingCart, 
-  Sun, 
-  Moon, 
-  Bell, 
-  HelpCircle, 
-  Smartphone, 
-  Store
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
+import { useCatalog } from '../context/CatalogContext';
+import {
+  ShoppingBag,
+  Search,
+  Heart,
+  ShoppingCart,
+  Bell,
+  HelpCircle,
+  Smartphone,
+  Store,
+  User,
 } from 'lucide-react';
 
 export const Header = () => {
-  const {
-    searchQuery,
-    setSearchQuery,
-    cart,
-    wishlist,
-    setIsCartOpen,
-    setIsWishlistOpen,
-    theme,
-    toggleTheme,
-    setSelectedCategory
-  } = useShop();
-
-  const totalCartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const navigate = useNavigate();
+  const { totalCartCount, wishlist } = useCart();
+  const { setSearchQuery, pushSearchHistory } = useCatalog();
+  const [draft, setDraft] = useState('');
 
   const quickSearchTags = ['Smartwatch AMOLED', 'TWS Wireless', 'Mechanical Keyboard', 'Sneakers Urban', 'Serum Niacinamide'];
 
+  const submitSearch = (term) => {
+    const value = (term ?? draft).trim();
+    setSearchQuery(value);
+    if (value) pushSearchHistory(value);
+    navigate(`/cari?q=${encodeURIComponent(value)}`);
+  };
+
   return (
     <>
-      {/* Top Utility Bar (Hidden on ultra-small mobile, visible on tablet/desktop) */}
       <div className="top-bar">
         <div className="max-w-layout top-bar-inner">
           <div className="top-bar-links">
@@ -48,18 +46,9 @@ export const Header = () => {
         </div>
       </div>
 
-      {/* Main Sticky Header */}
       <header className="main-header">
         <div className="max-w-layout header-inner">
-          {/* Brand Logo */}
-          <div 
-            className="brand-logo" 
-            onClick={() => {
-              setSelectedCategory('all');
-              setSearchQuery('');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-          >
+          <Link to="/" className="brand-logo" aria-label="belanjaIN beranda">
             <div className="brand-icon">
               <ShoppingBag size={20} strokeWidth={2.4} />
             </div>
@@ -67,33 +56,43 @@ export const Header = () => {
               <span className="brand-name-belanja">belanja</span>
               <span className="brand-name-in">IN</span>
             </div>
-          </div>
+          </Link>
 
-          {/* Search Bar */}
           <div className="search-container">
-            <div className="search-input-wrapper">
+            <form
+              className="search-input-wrapper"
+              onSubmit={(e) => {
+                e.preventDefault();
+                submitSearch();
+              }}
+            >
               <Search size={17} className="search-leading-icon" />
               <input
                 type="text"
                 placeholder="Cari promo diskon 90%, gadget, fashion, sneakers..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                value={draft}
+                onChange={(e) => {
+                  setDraft(e.target.value);
+                  setSearchQuery(e.target.value);
+                }}
                 className="search-input"
                 aria-label="Cari produk"
               />
-              <button className="search-btn">
+              <button type="submit" className="search-btn">
                 <Search size={14} />
                 <span className="search-btn-text">Cari</span>
               </button>
-            </div>
+            </form>
 
-            {/* Quick search suggestions */}
             <div className="search-tags">
-              {quickSearchTags.map((tag, idx) => (
-                <span 
-                  key={idx} 
+              {quickSearchTags.map((tag) => (
+                <span
+                  key={tag}
                   className="search-tag"
-                  onClick={() => setSearchQuery(tag)}
+                  onClick={() => {
+                    setDraft(tag);
+                    submitSearch(tag);
+                  }}
                 >
                   {tag}
                 </span>
@@ -101,40 +100,20 @@ export const Header = () => {
             </div>
           </div>
 
-          {/* Header Actions */}
           <div className="header-actions">
-            {/* Dark / Light Mode Toggle */}
-            <button 
-              className="action-btn theme-toggle-btn" 
-              onClick={toggleTheme} 
-              title={`Ganti ke ${theme === 'dark' ? 'Light Mode' : 'Dark Mode'}`}
-            >
-              {theme === 'dark' ? <Sun size={18} color="#FFE600" /> : <Moon size={18} color="#6366F1" />}
-            </button>
-
-            {/* Wishlist Button (Desktop & Tablet) */}
-            <button 
-              className="action-btn desktop-only-btn" 
-              onClick={() => setIsWishlistOpen(true)}
-              title="Daftar Keinginan"
-            >
+            <Link to="/wishlist" className="action-btn desktop-only-btn" title="Daftar Keinginan" aria-label="Daftar keinginan">
               <Heart size={18} />
-              {wishlist.length > 0 && (
-                <span className="badge-count">{wishlist.length}</span>
-              )}
-            </button>
+              {wishlist.length > 0 && <span className="badge-count">{wishlist.length}</span>}
+            </Link>
 
-            {/* Cart Drawer Trigger */}
-            <button 
-              className="action-btn" 
-              onClick={() => setIsCartOpen(true)}
-              title="Keranjang Belanja"
-            >
+            <Link to="/akun" className="action-btn desktop-only-btn" title="Akun Saya" aria-label="Akun saya">
+              <User size={18} />
+            </Link>
+
+            <Link to="/keranjang" className="action-btn" title="Keranjang Belanja" aria-label="Keranjang belanja">
               <ShoppingCart size={18} />
-              {totalCartCount > 0 && (
-                <span className="badge-count">{totalCartCount}</span>
-              )}
-            </button>
+              {totalCartCount > 0 && <span className="badge-count">{totalCartCount}</span>}
+            </Link>
           </div>
         </div>
       </header>
