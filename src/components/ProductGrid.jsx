@@ -47,7 +47,9 @@ export const ProductGrid = () => {
     onlyDiscount,
     setOnlyDiscount,
     onlyFreeShipping,
-    setOnlyFreeShipping
+    setOnlyFreeShipping,
+    setSearchQuery,
+    setSelectedCategory
   } = useShop();
 
   const currentCategoryObj = categories.find((c) => c.id === selectedCategory);
@@ -246,6 +248,8 @@ export const ProductGrid = () => {
             onClick={() => {
               setOnlyDiscount(false);
               setOnlyFreeShipping(false);
+              setSearchQuery('');
+              setSelectedCategory('all');
             }}
           >
             Reset Semua Filter

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingBag, ShieldCheck, Truck, Clock, Headphones, Award } from 'lucide-react';
+import { ShieldCheck, Truck, Clock, Headphones } from 'lucide-react';
 
 export const Footer = () => {
   return (
@@ -66,7 +66,7 @@ export const Footer = () => {
               <li><a href="#payment">Cara Pembayaran</a></li>
               <li><a href="#track">Lacak Pesanan Pembeli</a></li>
               <li><a href="#cod">COD (Bayar di Tempat)</a></li>
-              <li><a href="#guarantee">Garansi Shopee</a></li>
+              <li><a href="#guarantee">Garansi belanjaIN 100%</a></li>
             </ul>
           </div>
 
@@ -84,7 +84,7 @@ export const Footer = () => {
           <div>
             <div className="footer-col-title">PEMBAYARAN RESMI</div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-              <span style={{ background: 'var(--bg-surface-elevated)', padding: '4px 8px', borderRadius: '4px' }}>ShopeePay</span>
+              <span style={{ background: 'var(--bg-surface-elevated)', padding: '4px 8px', borderRadius: '4px' }}>belanjaPay</span>
               <span style={{ background: 'var(--bg-surface-elevated)', padding: '4px 8px', borderRadius: '4px' }}>QRIS</span>
               <span style={{ background: 'var(--bg-surface-elevated)', padding: '4px 8px', borderRadius: '4px' }}>BCA VA</span>
               <span style={{ background: 'var(--bg-surface-elevated)', padding: '4px 8px', borderRadius: '4px' }}>Mandiri</span>

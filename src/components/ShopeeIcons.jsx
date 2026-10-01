@@ -1,6 +1,6 @@
 import React from 'react';
 
-// --- 1. QUICK SERVICES 3D ILLUSTRATED ICONS (Shopee-Grade) ---
+// --- 1. QUICK SERVICES 3D ILLUSTRATED ICONS ---
 
 export const Icon3DFlashSale = ({ size = 32 }) => (
   <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -234,7 +234,7 @@ export const Icon3DPulsa = ({ size = 32 }) => (
 );
 
 
-// --- 2. CATEGORIES 3D ILLUSTRATED ICONS (Shopee-Grade) ---
+// --- 2. CATEGORIES 3D ILLUSTRATED ICONS ---
 
 export const CategoryIconAll = ({ size = 26 }) => (
   <svg width={size} height={size} viewBox="0 0 36 36" fill="none">

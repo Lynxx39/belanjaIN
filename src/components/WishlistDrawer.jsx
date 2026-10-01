@@ -1,6 +1,6 @@
 import React from 'react';
 import { useShop } from '../context/ShopContext';
-import { X, Heart, ShoppingCart, Trash2, ArrowRight } from 'lucide-react';
+import { X, Heart, ShoppingCart, Trash2 } from 'lucide-react';
 
 export const WishlistDrawer = () => {
   const {
@@ -28,7 +28,7 @@ export const WishlistDrawer = () => {
             <Heart size={20} color="#FF3366" fill="#FF3366" />
             <span>Daftar Impian ({favoriteProducts.length})</span>
           </div>
-          <button className="drawer-close-btn" onClick={() => setIsWishlistOpen(false)}>
+          <button className="drawer-close-btn" onClick={() => setIsWishlistOpen(false)} aria-label="Tutup daftar impian">
             <X size={18} />
           </button>
         </div>
@@ -39,10 +39,19 @@ export const WishlistDrawer = () => {
               <div
                 key={product.id}
                 className="cart-item"
+                role="button"
+                tabIndex={0}
                 style={{ cursor: 'pointer' }}
                 onClick={() => {
                   setSelectedProductModal(product);
                   setIsWishlistOpen(false);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedProductModal(product);
+                    setIsWishlistOpen(false);
+                  }
                 }}
               >
                 <img

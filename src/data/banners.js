@@ -8,7 +8,7 @@ export const banners = [
     categoryTarget: 'gadget',
     bgGradient: 'linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)',
     image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800&auto=format&fit=crop&q=80',
-    tags: ['⚡ Kilat 12.00', '🚚 Gratis Ongkir Rp0', '🪙 Koin Shopee 2x']
+    tags: ['⚡ Kilat 12.00', '🚚 Gratis Ongkir Rp0', '🪙 Koin belanjaIN 2x']
   },
   {
     id: 2,

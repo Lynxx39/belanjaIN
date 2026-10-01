@@ -1,17 +1,9 @@
 import React, { useState } from 'react';
 import { useShop } from '../context/ShopContext';
-import {
-  MessageSquare,
-  X,
-  Send,
-  Bot,
-  User,
-  Sparkles,
-  ShieldCheck
-} from 'lucide-react';
+import { X, Send, Bot } from 'lucide-react';
 
 export const ChatDrawer = () => {
-  const { isChatOpen, setIsChatOpen, showToast } = useShop();
+  const { isChatOpen, setIsChatOpen } = useShop();
 
   const [messages, setMessages] = useState([
     {
@@ -101,7 +93,7 @@ export const ChatDrawer = () => {
             </div>
           </div>
 
-          <button className="drawer-close-btn" onClick={() => setIsChatOpen(false)}>
+          <button className="drawer-close-btn" onClick={() => setIsChatOpen(false)} aria-label="Tutup chat">
             <X size={18} />
           </button>
         </div>

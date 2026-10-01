@@ -10,9 +10,7 @@ import {
   Bell, 
   HelpCircle, 
   Smartphone, 
-  Store,
-  Sparkles,
-  Zap
+  Store
 } from 'lucide-react';
 
 export const Header = () => {
@@ -81,6 +79,7 @@ export const Header = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="search-input"
+                aria-label="Cari produk"
               />
               <button className="search-btn">
                 <Search size={14} />

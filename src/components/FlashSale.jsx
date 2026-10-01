@@ -57,10 +57,16 @@ export const FlashSale = () => {
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--primary)', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer' }}>
+        <button
+          onClick={() => {
+            const el = document.getElementById('product-feed-section');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }}
+          style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'transparent', border: 'none', color: 'var(--primary)', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer' }}
+        >
           <span>Lihat Semua Promo</span>
           <ChevronRight size={16} />
-        </div>
+        </button>
       </div>
 
       <div className="product-grid">

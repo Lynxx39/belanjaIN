@@ -21,7 +21,7 @@ export const ToastContainer = () => {
   };
 
   return (
-    <div className="toast-container">
+    <div className="toast-container" role="status" aria-live="polite">
       {toasts.map((t) => (
         <div key={t.id} className={`toast-item ${t.type}`}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>

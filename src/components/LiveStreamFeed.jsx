@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useShop } from '../context/ShopContext';
-import { Radio, Users, Heart, ShoppingBag, Play, Sparkles } from 'lucide-react';
+import { Radio, Users } from 'lucide-react';
 
 export const LiveStreamFeed = () => {
-  const { products, setSelectedProductModal, addToCart } = useShop();
-
-  const [activeTab, setActiveTab] = useState(0);
+  const { products, setSelectedProductModal, addToCart, showToast } = useShop();
 
   const liveRooms = [
     {
@@ -54,9 +52,12 @@ export const LiveStreamFeed = () => {
           </h2>
         </div>
 
-        <span style={{ fontSize: '0.85rem', color: 'var(--primary)', fontWeight: 600, cursor: 'pointer' }}>
+        <button
+          onClick={() => showToast('belanjaIN Live', 'Semua sesi live akan tersedia di sini', 'info')}
+          style={{ background: 'transparent', border: 'none', fontSize: '0.85rem', color: 'var(--primary)', fontWeight: 600, cursor: 'pointer' }}
+        >
           Jelajahi Semua Live
-        </span>
+        </button>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem' }}>
@@ -109,6 +110,15 @@ export const LiveStreamFeed = () => {
 
               {room.product && (
                 <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setSelectedProductModal(room.product)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setSelectedProductModal(room.product);
+                    }
+                  }}
                   style={{
                     background: 'rgba(17, 24, 39, 0.9)',
                     backdropFilter: 'blur(12px)',
@@ -118,7 +128,8 @@ export const LiveStreamFeed = () => {
                     alignItems: 'center',
                     gap: '0.75rem',
                     border: '1px solid rgba(255, 75, 43, 0.4)',
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.5)'
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
+                    cursor: 'pointer'
                   }}
                 >
                   <img
@@ -139,7 +150,8 @@ export const LiveStreamFeed = () => {
                   <button
                     className="btn-primary"
                     style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem' }}
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       addToCart(room.product, 1);
                     }}
                   >

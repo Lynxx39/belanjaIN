@@ -1,15 +1,6 @@
 import React from 'react';
 import { useShop } from '../context/ShopContext';
-import {
-  CheckCircle,
-  Package,
-  Truck,
-  MapPin,
-  Calendar,
-  CreditCard,
-  ArrowRight,
-  Printer
-} from 'lucide-react';
+import { CheckCircle, ArrowRight, Printer } from 'lucide-react';
 
 export const OrderSuccess = () => {
   const { lastOrderSuccess, setLastOrderSuccess } = useShop();

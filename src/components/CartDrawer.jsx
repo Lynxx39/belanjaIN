@@ -8,7 +8,6 @@ import {
   ShoppingBag,
   Ticket,
   ArrowRight,
-  ShieldCheck,
   Tag
 } from 'lucide-react';
 import { vouchers } from '../data/vouchers';
@@ -80,7 +79,7 @@ export const CartDrawer = () => {
             <ShoppingBag size={20} color="var(--primary)" />
             <span>Keranjang Belanja ({cart.length})</span>
           </div>
-          <button className="drawer-close-btn" onClick={() => setIsCartOpen(false)}>
+          <button className="drawer-close-btn" onClick={() => setIsCartOpen(false)} aria-label="Tutup keranjang">
             <X size={18} />
           </button>
         </div>
@@ -152,6 +151,7 @@ export const CartDrawer = () => {
                         <div className="qty-control" style={{ transform: 'scale(0.85)', transformOrigin: 'right center' }}>
                           <button
                             className="qty-btn"
+                            aria-label="Kurangi jumlah"
                             onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)}
                           >
                             <Minus size={12} />
@@ -159,6 +159,7 @@ export const CartDrawer = () => {
                           <span className="qty-val">{item.quantity}</span>
                           <button
                             className="qty-btn"
+                            aria-label="Tambah jumlah"
                             onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
                           >
                             <Plus size={12} />

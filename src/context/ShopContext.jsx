@@ -120,7 +120,11 @@ export const ShopProvider = ({ children }) => {
       }
     });
 
-    showToast('Dimasukkan ke Keranjang!', `${product.name.slice(0, 30)}... (${quantity}x)`, 'success');
+    showToast(
+      'Dimasukkan ke Keranjang!',
+      `${product.name.length > 30 ? product.name.slice(0, 30) + '...' : product.name} (${quantity}x)`,
+      'success'
+    );
   };
 
   const removeFromCart = (cartItemId) => {
@@ -195,6 +199,9 @@ export const ShopProvider = ({ children }) => {
     showToast('Voucher Dilepas', 'Kupon promo dibatalkan', 'info');
   };
 
+  // Silent clear (no toast) used after a completed order
+  const clearVoucher = () => setAppliedVoucher(null);
+
   const clearSelectedCart = () => {
     setCart(prev => prev.filter(item => !item.selected));
   };
@@ -232,6 +239,7 @@ export const ShopProvider = ({ children }) => {
         appliedVoucher,
         applyVoucher,
         removeVoucher,
+        clearVoucher,
         theme,
         toggleTheme,
         toasts,

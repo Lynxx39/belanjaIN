@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { banners } from '../data/banners';
 import { useShop } from '../context/ShopContext';
-import { ChevronLeft, ChevronRight, ArrowRight, Zap } from 'lucide-react';
+import { ArrowRight, Zap } from 'lucide-react';
 
 export const HeroBanner = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -65,7 +65,16 @@ export const HeroBanner = () => {
             <div
               key={idx}
               className={`hero-indicator ${idx === currentSlide ? 'active' : ''}`}
+              role="button"
+              tabIndex={0}
+              aria-label={`Tampilkan slide ${idx + 1}`}
               onClick={() => setCurrentSlide(idx)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setCurrentSlide(idx);
+                }
+              }}
             />
           ))}
         </div>

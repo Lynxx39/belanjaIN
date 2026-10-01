@@ -28,7 +28,7 @@ export const QuickServiceGrid = () => {
     setOnlyFreeShipping,
     setIsCartOpen,
     showToast,
-    setSelectedCategory
+    setOnlyDiscount
   } = useShop();
 
   const handleServiceClick = (service) => {
@@ -50,7 +50,11 @@ export const QuickServiceGrid = () => {
     } else if (service.action === 'pulsa') {
       showToast('Layanan Pulsa & Tagihan', 'Fitur Top-Up & Pembayaran Tagihan aktif', 'info');
     } else {
-      setSelectedCategory('all');
+      // "Official Mall": no dedicated filter, surface the discount feed instead
+      setOnlyDiscount((prev) => !prev);
+      const el = document.getElementById('product-feed-section');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+      showToast('Official Mall', 'Menampilkan produk diskon pilihan mall', 'info');
     }
   };
 
@@ -64,7 +68,15 @@ export const QuickServiceGrid = () => {
             <div
               key={srv.id}
               className="quick-service-item"
+              role="button"
+              tabIndex={0}
               onClick={() => handleServiceClick(srv)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleServiceClick(srv);
+                }
+              }}
             >
               <div
                 className="quick-service-icon-wrap"

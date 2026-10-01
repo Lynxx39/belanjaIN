@@ -16,7 +16,7 @@ import { ChatDrawer } from './components/ChatDrawer';
 import { ToastContainer } from './components/ToastContainer';
 import { BottomNav } from './components/BottomNav';
 import { Footer } from './components/Footer';
-import { MessageSquare, Sparkles } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
 
 const MainApp = () => {
   const { setIsChatOpen } = useShop();

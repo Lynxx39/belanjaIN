@@ -3,7 +3,6 @@ import { useShop } from '../context/ShopContext';
 import {
   Star,
   Heart,
-  ShoppingCart,
   MapPin,
   ShieldCheck,
   Award,
@@ -35,7 +34,15 @@ export const ProductCard = ({ product, isFlashSaleItem = false }) => {
   return (
     <div
       className="product-card"
+      role="button"
+      tabIndex={0}
       onClick={() => setSelectedProductModal(product)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          setSelectedProductModal(product);
+        }
+      }}
     >
       {/* Image Wrap */}
       <div className="product-image-wrap">

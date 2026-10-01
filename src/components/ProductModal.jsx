@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useShop } from '../context/ShopContext';
 import {
   X,
@@ -8,7 +8,6 @@ import {
   Heart,
   ShoppingCart,
   Zap,
-  MessageSquare,
   Plus,
   Minus,
   Check
@@ -21,8 +20,7 @@ export const ProductModal = () => {
     addToCart,
     wishlist,
     toggleWishlist,
-    setIsCartOpen,
-    setIsChatOpen
+    setIsCartOpen
   } = useShop();
 
   const product = selectedProductModal;
@@ -35,6 +33,14 @@ export const ProductModal = () => {
     product?.variants?.options?.[0] || 'Default'
   );
   const [quantity, setQuantity] = useState(1);
+
+  // Reset selection whenever a different product is opened
+  useEffect(() => {
+    setActiveImgIndex(0);
+    setSelectedColor(product?.variants?.colors?.[0] || 'Default');
+    setSelectedOption(product?.variants?.options?.[0] || 'Default');
+    setQuantity(1);
+  }, [product]);
 
   if (!product) return null;
 
@@ -59,6 +65,7 @@ export const ProductModal = () => {
         <button
           className="modal-close-icon"
           onClick={() => setSelectedProductModal(null)}
+          aria-label="Tutup detail produk"
         >
           <X size={20} />
         </button>
@@ -226,6 +233,7 @@ export const ProductModal = () => {
               <div className="qty-control">
                 <button
                   className="qty-btn"
+                  aria-label="Kurangi jumlah"
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                   disabled={quantity <= 1}
                 >
@@ -234,6 +242,7 @@ export const ProductModal = () => {
                 <span className="qty-val">{quantity}</span>
                 <button
                   className="qty-btn"
+                  aria-label="Tambah jumlah"
                   onClick={() => setQuantity((q) => Math.min(product.stock, q + 1))}
                   disabled={quantity >= product.stock}
                 >

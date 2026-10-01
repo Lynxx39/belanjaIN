@@ -11,8 +11,7 @@ import {
   Wallet,
   Building2,
   Banknote,
-  Sparkles,
-  ArrowRight
+  Sparkles
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -22,6 +21,7 @@ export const CheckoutModal = () => {
     isCheckoutOpen,
     setIsCheckoutOpen,
     appliedVoucher,
+    clearVoucher,
     clearSelectedCart,
     setLastOrderSuccess,
     showToast
@@ -34,7 +34,7 @@ export const CheckoutModal = () => {
   const [phone, setPhone] = useState('0812-3456-7890');
   const [address, setAddress] = useState('Jl. Jend. Sudirman No. 45, Kebayoran Baru, Jakarta Selatan, 12190');
   const [shippingMethod, setShippingMethod] = useState('reguler');
-  const [paymentMethod, setPaymentMethod] = useState('shopeepay');
+  const [paymentMethod, setPaymentMethod] = useState('belanjapay');
   const [isProcessing, setIsProcessing] = useState(false);
 
   if (!isCheckoutOpen || selectedItems.length === 0) return null;
@@ -108,6 +108,7 @@ export const CheckoutModal = () => {
       };
 
       clearSelectedCart();
+      clearVoucher();
       setIsProcessing(false);
       setIsCheckoutOpen(false);
       setLastOrderSuccess(orderData);
@@ -128,7 +129,7 @@ export const CheckoutModal = () => {
             <ShieldCheck size={22} color="var(--primary)" />
             <span>Pengiriman & Pembayaran Aman</span>
           </div>
-          <button className="drawer-close-btn" onClick={() => setIsCheckoutOpen(false)}>
+          <button className="drawer-close-btn" onClick={() => setIsCheckoutOpen(false)} aria-label="Tutup checkout">
             <X size={18} />
           </button>
         </div>
@@ -211,7 +212,15 @@ export const CheckoutModal = () => {
               {Object.entries(shippingRates).map(([key, item]) => (
                 <div
                   key={key}
+                  role="button"
+                  tabIndex={0}
                   onClick={() => setShippingMethod(key)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setShippingMethod(key);
+                    }
+                  }}
                   style={{
                     padding: '0.85rem',
                     borderRadius: 'var(--radius-sm)',
@@ -242,27 +251,43 @@ export const CheckoutModal = () => {
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
-              {/* ShopeePay */}
+              {/* belanjaPay */}
               <div
-                onClick={() => setPaymentMethod('shopeepay')}
+                role="button"
+                tabIndex={0}
+                onClick={() => setPaymentMethod('belanjapay')}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setPaymentMethod('belanjapay');
+                  }
+                }}
                 style={{
                   padding: '0.85rem',
                   borderRadius: 'var(--radius-sm)',
-                  background: paymentMethod === 'shopeepay' ? 'rgba(255, 75, 43, 0.1)' : 'var(--bg-surface)',
-                  border: `1.5px solid ${paymentMethod === 'shopeepay' ? 'var(--primary)' : 'var(--border-subtle)'}`,
+                  background: paymentMethod === 'belanjapay' ? 'rgba(255, 75, 43, 0.1)' : 'var(--bg-surface)',
+                  border: `1.5px solid ${paymentMethod === 'belanjapay' ? 'var(--primary)' : 'var(--border-subtle)'}`,
                   cursor: 'pointer'
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '4px' }}>
                   <Wallet size={16} color="var(--primary)" />
-                  <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>ShopeePay</span>
+                  <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>belanjaPay</span>
                 </div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Saldo: Rp 1.500.000</div>
               </div>
 
               {/* QRIS */}
               <div
+                role="button"
+                tabIndex={0}
                 onClick={() => setPaymentMethod('qris')}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setPaymentMethod('qris');
+                  }
+                }}
                 style={{
                   padding: '0.85rem',
                   borderRadius: 'var(--radius-sm)',
@@ -280,7 +305,15 @@ export const CheckoutModal = () => {
 
               {/* Bank Transfer */}
               <div
+                role="button"
+                tabIndex={0}
                 onClick={() => setPaymentMethod('bca_va')}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setPaymentMethod('bca_va');
+                  }
+                }}
                 style={{
                   padding: '0.85rem',
                   borderRadius: 'var(--radius-sm)',
@@ -298,7 +331,15 @@ export const CheckoutModal = () => {
 
               {/* COD */}
               <div
+                role="button"
+                tabIndex={0}
                 onClick={() => setPaymentMethod('cod')}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setPaymentMethod('cod');
+                  }
+                }}
                 style={{
                   padding: '0.85rem',
                   borderRadius: 'var(--radius-sm)',
