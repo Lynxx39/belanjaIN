@@ -44,9 +44,27 @@ export const StoreCartGroup = ({ storeId, items }) => {
               <div className="cart-item-price">{formatRupiah(item.product.price)}</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <div className="qty-control">
-                  <button className="qty-btn" aria-label="Kurangi jumlah" onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)}><Minus size={12} /></button>
+                  <button
+                    className="qty-btn"
+                    aria-label="Kurangi jumlah"
+                    onClick={() => {
+                      if (item.quantity > 1) {
+                        updateQuantity(item.cartItemId, item.quantity - 1);
+                      }
+                    }}
+                    disabled={item.quantity <= 1}
+                  >
+                    <Minus size={12} />
+                  </button>
                   <span className="qty-val">{item.quantity}</span>
-                  <button className="qty-btn" aria-label="Tambah jumlah" onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}><Plus size={12} /></button>
+                  <button
+                    className="qty-btn"
+                    aria-label="Tambah jumlah"
+                    onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
+                    disabled={item.quantity >= (item.product?.stock ?? 9999)}
+                  >
+                    <Plus size={12} />
+                  </button>
                 </div>
                 <button className="cart-delete-btn" aria-label="Hapus item" onClick={() => removeFromCart(item.cartItemId)}><Trash2 size={16} /></button>
               </div>

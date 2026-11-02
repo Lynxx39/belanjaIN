@@ -31,6 +31,24 @@ assert.equal(isEligible(1000, percentVoucher), true);
 assert.equal(isEligible(999, percentVoucher), false);
 assert.equal(voucherDiscount(2000, { minSpend: 0, discountType: 'shipping', discountValue: 20000 }), 0, 'shipping handled elsewhere');
 
+// Uncapped percent voucher doesn't return NaN
+const uncappedPercent = { minSpend: 100, discountType: 'percent', discountValue: 10 };
+assert.equal(voucherDiscount(500, uncappedPercent), 50);
+
+// Fixed voucher capped at subtotal
+const highFixed = { minSpend: 50, discountType: 'fixed', discountValue: 200 };
+assert.equal(voucherDiscount(100, highFixed), 100);
+
+// Store-specific voucher tests
+const storeVoucher = { scope: 'store', storeId: 'tokoku', minSpend: 100, discountType: 'fixed', discountValue: 50 };
+const cartSample = [
+  { storeId: 'other', product: { price: 200 }, quantity: 1 },
+  { storeId: 'tokoku', product: { price: 150 }, quantity: 1 },
+];
+assert.equal(isEligible(350, storeVoucher, cartSample), true);
+assert.equal(isEligible(350, storeVoucher, [{ storeId: 'other', product: { price: 350 }, quantity: 1 }]), false);
+assert.equal(voucherDiscount(350, storeVoucher, cartSample), 50);
+
 const grouped = groupByStore([
   { storeId: 'a', id: 1 }, { storeId: 'b', id: 2 }, { storeId: 'a', id: 3 },
 ]);

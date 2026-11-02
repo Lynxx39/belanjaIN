@@ -1,5 +1,5 @@
 import React from 'react';
-import { STATUS_FLOW, STATUS_LABEL } from '../context/AccountContext';
+import { STATUS_FLOW, STATUS_LABEL } from '../constants/status';
 import { Check } from 'lucide-react';
 
 export const OrderStatusTracker = ({ status }) => {
@@ -17,7 +17,7 @@ export const OrderStatusTracker = ({ status }) => {
           <React.Fragment key={step}>
             <div className={`tracker-step ${done ? 'done' : ''} ${idx === currentIndex ? 'current' : ''}`}>
               <div className="tracker-dot">{done ? <Check size={13} /> : idx + 1}</div>
-              <span className="tracker-label">{STATUS_LABEL[step]}</span>
+              <span className="tracker-label">{STATUS_LABEL[step] || step}</span>
             </div>
             {idx < STATUS_FLOW.length - 1 && <div className={`tracker-line ${idx < currentIndex ? 'done' : ''}`} />}
           </React.Fragment>

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAccount } from '../context/AccountContext';
 import { useCart } from '../context/CartContext';
 import { useUi } from '../context/UiContext';
-import { addressForm } from '../utils/validate';
+import { addressForm, phone } from '../utils/validate';
 import { formatRupiah } from '../utils/format';
 import { User, MapPin, Plus, Trash2, LogOut, ShoppingBag, Check, Phone, Store } from 'lucide-react';
 
@@ -23,6 +23,11 @@ export const Account = () => {
     e.preventDefault();
     if (!form.name.trim() || !form.phone.trim()) {
       showToast('Data Belum Lengkap', 'Isi nama dan nomor HP', 'warning');
+      return;
+    }
+    const phoneCheck = phone(form.phone);
+    if (!phoneCheck.ok) {
+      showToast('Nomor HP Tidak Valid', phoneCheck.message, 'error');
       return;
     }
     login(form);

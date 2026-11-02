@@ -1,6 +1,7 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAccount, STATUS, STATUS_LABEL } from '../context/AccountContext';
+import { useAccount } from '../context/AccountContext';
+import { STATUS, STATUS_LABEL } from '../constants/status';
 import { useUi } from '../context/UiContext';
 import { getStore } from '../data/stores';
 import { formatRupiah, formatDate } from '../utils/format';
@@ -27,8 +28,8 @@ export const OrderDetail = () => {
   const canAdvance = [STATUS.DIKEMAS, STATUS.DIKIRIM].includes(order.status);
 
   const groups = Object.values(
-    order.items.reduce((acc, item) => {
-      const sid = item.storeId || 'unknown';
+    (order.items || []).reduce((acc, item) => {
+      const sid = item.storeId || item.product?.storeId || 'unknown';
       (acc[sid] = acc[sid] || []).push(item);
       return acc;
     }, {})
@@ -38,7 +39,7 @@ export const OrderDetail = () => {
     <div style={{ margin: '1.5rem 0' }}>
       <div className="section-head-row">
         <h1 className="section-title">Detail Pesanan</h1>
-        <span className={`order-status status-${order.status}`}>{STATUS_LABEL[order.status]}</span>
+        <span className={`order-status status-${order.status}`}>{STATUS_LABEL[order.status] || order.status}</span>
       </div>
 
       <div className="order-detail-card">
@@ -56,19 +57,19 @@ export const OrderDetail = () => {
         )}
 
         {groups.map((items) => {
-          const store = getStore(items[0].storeId || 'unknown');
+          const store = getStore(items[0]?.storeId || 'unknown');
           return (
             <div key={store.id} className="order-store-block">
               <div className="checkout-card-head"><Store size={15} /> {store.name} {store.isOfficial && <ShieldCheck size={12} />}</div>
               {items.map((item) => (
                 <div key={item.cartItemId} className="checkout-item">
-                  <img src={item.product.images[0]} alt={item.product.name} className="cart-item-img" />
+                  <img src={item.product?.images?.[0] || ''} alt={item.product?.name || 'Produk'} className="cart-item-img" />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div className="cart-item-name">{item.product.name}</div>
+                    <div className="cart-item-name">{item.product?.name}</div>
                     <div className="cart-item-variant">{item.selectedVariant?.color}, {item.selectedVariant?.option}</div>
                   </div>
                   <div className="checkout-item-qty">{item.quantity}x</div>
-                  <div className="cart-item-price">{formatRupiah(item.product.price * item.quantity)}</div>
+                  <div className="cart-item-price">{formatRupiah((item.product?.price || 0) * item.quantity)}</div>
                 </div>
               ))}
             </div>
@@ -79,14 +80,14 @@ export const OrderDetail = () => {
       <div className="order-detail-grid">
         <div className="order-detail-card">
           <div className="checkout-card-head"><MapPin size={16} color="var(--primary)" /> Alamat Pengiriman</div>
-          <div className="address-item-top"><strong>{order.buyer.name}</strong></div>
-          <div className="address-item-detail">{order.buyer.address}</div>
-          <div className="address-item-detail">{order.buyer.phone}</div>
+          <div className="address-item-top"><strong>{order.buyer?.name || 'Pembeli'}</strong></div>
+          <div className="address-item-detail">{order.buyer?.address || '-'}</div>
+          <div className="address-item-detail">{order.buyer?.phone || '-'}</div>
         </div>
 
         <div className="order-detail-card">
           <div className="checkout-card-head"><CreditCard size={16} color="var(--accent-green)" /> Pembayaran</div>
-          <div className="cart-summary-row"><span>Metode</span><span>{order.paymentName}</span></div>
+          <div className="cart-summary-row"><span>Metode</span><span>{order.paymentName || order.paymentMethod}</span></div>
           <div className="cart-summary-row"><span>Subtotal produk</span><span>{formatRupiah(order.itemsTotal)}</span></div>
           <div className="cart-summary-row"><span>Ongkir</span><span>{formatRupiah(order.shippingCost)}</span></div>
           {order.itemDiscount > 0 && <div className="cart-summary-row discount"><span>Diskon</span><span>-{formatRupiah(order.itemDiscount)}</span></div>}

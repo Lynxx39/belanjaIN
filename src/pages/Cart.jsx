@@ -32,8 +32,8 @@ export const Cart = () => {
     }, {})
   );
 
-  const allSelected = cart.every((i) => i.selected);
-  const discount = voucherDiscount(subtotal, appliedVoucher);
+  const allSelected = cart.length > 0 && cart.every((i) => i.selected);
+  const discount = voucherDiscount(subtotal, appliedVoucher, selectedItems);
   const total = Math.max(0, subtotal - discount);
 
   return (

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useCatalog } from '../context/CatalogContext';
 import { useUi } from '../context/UiContext';
+import { useCart } from '../context/CartContext';
 import { voucherDiscount, isEligible } from '../utils/coupon';
 import { formatRupiah } from '../utils/format';
 import { Ticket, Check, Tag } from 'lucide-react';
@@ -8,17 +9,26 @@ import { Ticket, Check, Tag } from 'lucide-react';
 export const VoucherPicker = ({ subtotal, storeId = null }) => {
   const { vouchers } = useCatalog();
   const { appliedVoucher, setAppliedVoucher, removeVoucher, showToast } = useUi();
+  const { selectedItems } = useCart();
   const [tab, setTab] = useState('platform');
   const [code, setCode] = useState('');
 
+  const activeStoreIds = Array.from(
+    new Set([storeId, ...selectedItems.map((i) => i.storeId || i.product?.storeId)].filter(Boolean))
+  );
+
   const byScope = (scope) =>
-    vouchers.filter((v) => v.scope === scope && (scope === 'platform' || !storeId || v.storeId === storeId));
+    vouchers.filter((v) => {
+      if (scope === 'platform') return v.scope === 'platform';
+      if (v.scope !== 'store') return false;
+      return activeStoreIds.length === 0 || activeStoreIds.includes(v.storeId);
+    });
 
   const current = appliedVoucher;
-  const discount = voucherDiscount(subtotal, current);
+  const discount = voucherDiscount(subtotal, current, selectedItems);
 
   const apply = (voucher) => {
-    if (!isEligible(subtotal, voucher)) {
+    if (!isEligible(subtotal, voucher, selectedItems)) {
       showToast('Belum Memenuhi Syarat', `Min. belanja ${formatRupiah(voucher.minSpend)} untuk voucher ini`, 'warning');
       return;
     }
@@ -42,12 +52,12 @@ export const VoucherPicker = ({ subtotal, storeId = null }) => {
 
       <div className="voucher-tabs">
         <button className={`voucher-tab ${tab === 'platform' ? 'active' : ''}`} onClick={() => setTab('platform')}>Platform belanjaIN</button>
-        <button className={`voucher-tab ${tab === 'store' ? 'active' : ''}`} onClick={() => setTab('store')} disabled={!storeId}>Voucher Toko</button>
+        <button className={`voucher-tab ${tab === 'store' ? 'active' : ''}`} onClick={() => setTab('store')} disabled={activeStoreIds.length === 0}>Voucher Toko</button>
       </div>
 
       <div className="voucher-list">
         {byScope(tab).map((v) => {
-          const eligible = isEligible(subtotal, v);
+          const eligible = isEligible(subtotal, v, selectedItems);
           const active = current?.code === v.code;
           return (
             <button

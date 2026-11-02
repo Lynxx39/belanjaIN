@@ -11,6 +11,7 @@ export const ProductCard = ({ product, isFlashSaleItem = false }) => {
   const { showToast } = useUi();
 
   const isFavorite = wishlist.includes(product.id);
+  const isOutOfStock = (product.stock ?? 0) <= 0;
   const open = () => navigate(`/produk/${product.id}`);
 
   const handleWishlist = (e) => {
@@ -25,6 +26,10 @@ export const ProductCard = ({ product, isFlashSaleItem = false }) => {
 
   const handleAdd = (e) => {
     e.stopPropagation();
+    if (isOutOfStock) {
+      showToast('Stok Habis', 'Produk ini sedang tidak tersedia', 'warning');
+      return;
+    }
     addToCart(product, 1);
     showToast('Dimasukkan ke Keranjang!', product.name, 'success');
   };
@@ -113,8 +118,10 @@ export const ProductCard = ({ product, isFlashSaleItem = false }) => {
           <button
             className="card-quick-cart-btn"
             onClick={handleAdd}
-            title="Tambah ke Keranjang"
-            aria-label="Tambah ke keranjang"
+            title={isOutOfStock ? 'Stok Habis' : 'Tambah ke Keranjang'}
+            aria-label={isOutOfStock ? 'Stok habis' : 'Tambah ke keranjang'}
+            disabled={isOutOfStock}
+            style={isOutOfStock ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
           >
             <Plus size={15} strokeWidth={2.8} />
           </button>

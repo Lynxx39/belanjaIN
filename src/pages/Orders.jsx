@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAccount, STATUS_LABEL } from '../context/AccountContext';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAccount } from '../context/AccountContext';
+import { STATUS_LABEL } from '../constants/status';
 import { formatRupiah, formatDate } from '../utils/format';
-import { ShoppingBag } from 'lucide-react';
+import { ShoppingBag, Info, UserPlus } from 'lucide-react';
 
 export const Orders = () => {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ export const Orders = () => {
     { id: 'selesai', label: 'Selesai' },
   ];
 
-  if (!account) {
+  if (!account && orders.length === 0) {
     return (
       <div className="empty-state-box" style={{ margin: '3rem 0' }}>
         <ShoppingBag size={56} color="var(--text-subtle)" style={{ marginBottom: '1rem', opacity: 0.5 }} />
@@ -35,6 +36,31 @@ export const Orders = () => {
       <div className="section-head-row">
         <h1 className="section-title">Pesanan Saya</h1>
       </div>
+
+      {!account && orders.length > 0 && (
+        <div
+          style={{
+            background: 'rgba(238, 77, 45, 0.08)',
+            border: '1px solid rgba(238, 77, 45, 0.25)',
+            borderRadius: '12px',
+            padding: '1rem 1.25rem',
+            marginBottom: '1.5rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '1rem',
+            flexWrap: 'wrap',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: 'var(--text-main)', fontSize: '0.9rem' }}>
+            <Info size={18} color="var(--primary)" />
+            <span>Pesanan ini disimpan di browser ini sebagai <strong>Tamu</strong>. Masuk akun agar riwayat tidak hilang saat berganti perangkat.</span>
+          </div>
+          <Link to="/akun" className="btn-primary" style={{ padding: '0.4rem 0.85rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+            <UserPlus size={14} /> Masuk Akun
+          </Link>
+        </div>
+      )}
 
       <div className="order-tabs">
         {tabs.map((t) => (
@@ -56,13 +82,13 @@ export const Orders = () => {
             <button key={order.id} className="order-card" onClick={() => navigate(`/pesanan/${order.id}`)}>
               <div className="order-card-top">
                 <span className="order-id">{order.id}</span>
-                <span className={`order-status status-${order.status}`}>{STATUS_LABEL[order.status]}</span>
+                <span className={`order-status status-${order.status}`}>{STATUS_LABEL[order.status] || order.status}</span>
               </div>
               <div className="order-card-mid">
-                {order.items.slice(0, 3).map((item) => (
-                  <img key={item.cartItemId} src={item.product.images[0]} alt={item.product.name} className="order-thumb" />
+                {(order.items || []).slice(0, 3).map((item) => (
+                  <img key={item.cartItemId} src={item.product?.images?.[0] || ''} alt={item.product?.name || 'Produk'} className="order-thumb" />
                 ))}
-                <div className="order-item-count">{order.items.length} produk</div>
+                <div className="order-item-count">{(order.items || []).length} produk</div>
               </div>
               <div className="order-card-bottom">
                 <span className="order-date">{formatDate(order.createdAt)}</span>

@@ -9,38 +9,41 @@ export const useCart = () => useContext(CartContext);
 export const CartProvider = ({ children }) => {
   const { userId } = useAccount();
   const keys = accountKeys(userId);
+
   const [cart, setCart] = useState(() => readJSON(accountKeys(userId).cart, []));
   const [wishlist, setWishlist] = useState(() => readJSON(accountKeys(userId).wishlist, []));
-  const [hydratedFor, setHydratedFor] = useState(userId);
+  const [prevUserId, setPrevUserId] = useState(userId);
 
-  // Re-hydrate when the active account changes
-  useEffect(() => {
+  // Synchronize cart and wishlist when active user changes
+  if (prevUserId !== userId) {
+    setPrevUserId(userId);
     setCart(readJSON(accountKeys(userId).cart, []));
     setWishlist(readJSON(accountKeys(userId).wishlist, []));
-    setHydratedFor(userId);
-  }, [userId]);
+  }
 
   useEffect(() => {
-    if (hydratedFor !== userId) return;
     writeJSON(keys.cart, cart);
-  }, [cart, hydratedFor, userId, keys.cart]);
+  }, [cart, keys.cart]);
 
   useEffect(() => {
-    if (hydratedFor !== userId) return;
     writeJSON(keys.wishlist, wishlist);
-  }, [wishlist, hydratedFor, userId, keys.wishlist]);
+  }, [wishlist, keys.wishlist]);
 
   const addToCart = (product, quantity = 1, variant = null) => {
+    if (!product) return;
     const color = variant?.color || product.variants?.colors?.[0] || 'Default';
     const option = variant?.option || product.variants?.options?.[0] || 'Default';
     const cartItemId = `${product.id}-${color}-${option}`;
+    const maxStock = product.stock ?? 9999;
+    const safeQty = Math.max(1, Math.min(Number(quantity) || 1, maxStock));
 
     setCart((prev) => {
       const existing = prev.find((item) => item.cartItemId === cartItemId);
       if (existing) {
+        const nextQty = Math.min(existing.quantity + safeQty, maxStock);
         return prev.map((item) =>
           item.cartItemId === cartItemId
-            ? { ...item, quantity: item.quantity + quantity, selected: true }
+            ? { ...item, quantity: nextQty, selected: true }
             : item
         );
       }
@@ -50,7 +53,7 @@ export const CartProvider = ({ children }) => {
           cartItemId,
           product,
           storeId: product.storeId || product.store?.id || 'unknown',
-          quantity,
+          quantity: safeQty,
           selectedVariant: { color, option },
           selected: true,
         },
@@ -63,12 +66,18 @@ export const CartProvider = ({ children }) => {
   };
 
   const updateQuantity = (cartItemId, newQty) => {
-    if (newQty <= 0) {
+    const qtyNum = Number(newQty);
+    if (isNaN(qtyNum) || qtyNum <= 0) {
       removeFromCart(cartItemId);
       return;
     }
     setCart((prev) =>
-      prev.map((item) => (item.cartItemId === cartItemId ? { ...item, quantity: newQty } : item))
+      prev.map((item) => {
+        if (item.cartItemId !== cartItemId) return item;
+        const maxStock = item.product?.stock ?? 9999;
+        const boundedQty = Math.min(Math.max(1, qtyNum), maxStock);
+        return { ...item, quantity: boundedQty };
+      })
     );
   };
 
@@ -97,7 +106,7 @@ export const CartProvider = ({ children }) => {
   };
 
   const selectedItems = cart.filter((item) => item.selected);
-  const subtotal = selectedItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const subtotal = selectedItems.reduce((sum, item) => sum + (item.product?.price || 0) * item.quantity, 0);
   const totalCartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (

@@ -35,23 +35,31 @@ export const Checkout = () => {
   const address = account ? defaultAddress : guestAddr;
   const groups = groupByStore(selectedItems);
 
-  const shippingFor = (key) => (shipping[key] || 'reguler');
+  const shippingFor = (key) => shipping[key] || 'reguler';
   const totalShipping = groups.reduce((sum, items) => {
     const storeId = items[0].storeId;
-    return sum + SHIPPING_OPTIONS[shippingFor(storeId)].price;
+    const opt = SHIPPING_OPTIONS[shippingFor(storeId)] || SHIPPING_OPTIONS.reguler;
+    return sum + (opt.price || 0);
   }, 0);
 
   const shippingVoucher = appliedVoucher?.discountType === 'shipping' ? appliedVoucher : null;
   const itemVoucher = appliedVoucher && appliedVoucher.discountType !== 'shipping' ? appliedVoucher : null;
-  const itemDiscount = voucherDiscount(subtotal, itemVoucher);
+  const itemDiscount = voucherDiscount(subtotal, itemVoucher, selectedItems);
   const shippingDiscount = Math.min(totalShipping, shippingVoucher ? shippingVoucher.discountValue : 0);
   const grandTotal = Math.max(0, subtotal - itemDiscount + totalShipping - shippingDiscount);
 
   const ensureAddress = () => {
-    if (account) return Boolean(defaultAddress);
+    if (account) {
+      if (!defaultAddress) {
+        showToast('Alamat Belum Tersedia', 'Silakan tambahkan alamat utama terlebih dahulu', 'warning');
+        return false;
+      }
+      return true;
+    }
     const check = addressForm(guestAddr);
     if (!check.ok) {
       setGuestError(check.message);
+      showToast('Alamat Belum Lengkap', check.message, 'warning');
       return false;
     }
     setGuestError('');
@@ -59,22 +67,27 @@ export const Checkout = () => {
   };
 
   const handleOrder = () => {
+    if (selectedItems.length === 0) return;
     if (!ensureAddress()) return;
-    const method = PAYMENT_METHODS.find((m) => m.key === payment);
+    const method = PAYMENT_METHODS.find((m) => m.key === payment) || PAYMENT_METHODS[0];
     const order = placeOrder({
       items: groups.flat(),
       stores: groups.map((items) => ({
         store: getStore(items[0].storeId),
-        shipping: SHIPPING_OPTIONS[shippingFor(items[0].storeId)],
+        shipping: SHIPPING_OPTIONS[shippingFor(items[0].storeId)] || SHIPPING_OPTIONS.reguler,
       })),
-      buyer: { name: address.name, phone: address.phone, address: address.detail },
+      buyer: {
+        name: address?.name || 'Tamu',
+        phone: address?.phone || '',
+        address: address?.detail || '',
+      },
       paymentMethod: payment,
       paymentName: method.name,
       note,
       voucherCode: appliedVoucher?.code || null,
       itemDiscount,
       shippingDiscount,
-      shippingCost: totalShipping - shippingDiscount,
+      shippingCost: Math.max(0, totalShipping - shippingDiscount),
       itemsTotal: subtotal,
       totalAmount: grandTotal,
     });

@@ -5,7 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useUi } from '../context/UiContext';
 import { ProductCard } from '../components/ProductCard';
 import { formatRupiah } from '../utils/format';
-import { Star, ShieldCheck, Truck, Heart, ShoppingCart, Zap, Plus, Minus, Check, Store } from 'lucide-react';
+import { Star, ShieldCheck, Truck, Heart, ShoppingCart, Zap, Plus, Minus, Check, Store, AlertCircle } from 'lucide-react';
 
 export const ProductDetail = () => {
   const { id } = useParams();
@@ -16,18 +16,24 @@ export const ProductDetail = () => {
 
   const product = getProduct(id);
 
+  const [prevId, setPrevId] = useState(id);
   const [activeImgIndex, setActiveImgIndex] = useState(0);
   const [selectedColor, setSelectedColor] = useState(product?.variants?.colors?.[0] || 'Default');
   const [selectedOption, setSelectedOption] = useState(product?.variants?.options?.[0] || 'Default');
   const [quantity, setQuantity] = useState(1);
 
-  useEffect(() => {
+  // Synchronize state during render when navigated to a different product
+  if (prevId !== id) {
+    setPrevId(id);
     setActiveImgIndex(0);
     setSelectedColor(product?.variants?.colors?.[0] || 'Default');
     setSelectedOption(product?.variants?.options?.[0] || 'Default');
     setQuantity(1);
-    window.scrollTo({ top: 0 });
-  }, [product]);
+  }
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [id]);
 
   if (!product) {
     return (
@@ -41,13 +47,22 @@ export const ProductDetail = () => {
 
   const isFavorite = wishlist.includes(product.id);
   const variant = { color: selectedColor, option: selectedOption };
+  const isOutOfStock = (product.stock ?? 0) <= 0;
 
   const handleAddToCart = () => {
+    if (isOutOfStock) {
+      showToast('Stok Habis', 'Produk ini sedang tidak tersedia', 'warning');
+      return;
+    }
     addToCart(product, quantity, variant);
     showToast('Dimasukkan ke Keranjang!', `${product.name} (${quantity}x)`, 'success');
   };
 
   const handleBuyNow = () => {
+    if (isOutOfStock) {
+      showToast('Stok Habis', 'Produk ini sedang tidak tersedia', 'warning');
+      return;
+    }
     addToCart(product, quantity, variant);
     navigate('/keranjang');
   };
@@ -85,7 +100,9 @@ export const ProductDetail = () => {
               <Star size={16} fill="var(--primary)" /> {product.rating}
             </span>
             <span className="detail-divider">|</span>
-            <span style={{ color: 'var(--text-muted)' }}>Stok: <strong style={{ color: 'var(--text-main)' }}>{product.stock}</strong></span>
+            <span style={{ color: 'var(--text-muted)' }}>
+              Stok: <strong style={{ color: isOutOfStock ? '#EF4444' : 'var(--text-main)' }}>{isOutOfStock ? 'Habis' : product.stock}</strong>
+            </span>
             <span className="detail-divider">|</span>
             <span style={{ color: 'var(--text-muted)' }}>Lokasi: {product.store?.location || product.location}</span>
           </div>
@@ -130,16 +147,36 @@ export const ProductDetail = () => {
           <div className="detail-qty">
             <span>Kuantitas:</span>
             <div className="qty-control">
-              <button className="qty-btn" aria-label="Kurangi jumlah" onClick={() => setQuantity((q) => Math.max(1, q - 1))} disabled={quantity <= 1}><Minus size={14} /></button>
-              <span className="qty-val">{quantity}</span>
-              <button className="qty-btn" aria-label="Tambah jumlah" onClick={() => setQuantity((q) => Math.min(product.stock, q + 1))} disabled={quantity >= product.stock}><Plus size={14} /></button>
+              <button
+                className="qty-btn"
+                aria-label="Kurangi jumlah"
+                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                disabled={isOutOfStock || quantity <= 1}
+              >
+                <Minus size={14} />
+              </button>
+              <span className="qty-val">{isOutOfStock ? 0 : quantity}</span>
+              <button
+                className="qty-btn"
+                aria-label="Tambah jumlah"
+                onClick={() => setQuantity((q) => Math.min(product.stock, q + 1))}
+                disabled={isOutOfStock || quantity >= product.stock}
+              >
+                <Plus size={14} />
+              </button>
             </div>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)' }}>Tersisa {product.stock}</span>
+            <span style={{ fontSize: '0.75rem', color: isOutOfStock ? '#EF4444' : 'var(--text-subtle)' }}>
+              {isOutOfStock ? 'Stok sedang kosong' : `Tersisa ${product.stock}`}
+            </span>
           </div>
 
           <div className="detail-actions">
-            <button className="btn-outline-primary" onClick={handleAddToCart}><ShoppingCart size={18} /> + Keranjang</button>
-            <button className="btn-primary" onClick={handleBuyNow}><Zap size={18} /> Beli Sekarang</button>
+            <button className="btn-outline-primary" onClick={handleAddToCart} disabled={isOutOfStock}>
+              <ShoppingCart size={18} /> + Keranjang
+            </button>
+            <button className="btn-primary" onClick={handleBuyNow} disabled={isOutOfStock}>
+              <Zap size={18} /> Beli Sekarang
+            </button>
             <button
               className={`action-icon-btn ${isFavorite ? 'active' : ''}`}
               onClick={() => toggleWishlist(product.id)}
@@ -148,6 +185,12 @@ export const ProductDetail = () => {
               <Heart size={20} fill={isFavorite ? 'var(--primary)' : 'none'} color={isFavorite ? 'var(--primary)' : 'currentColor'} />
             </button>
           </div>
+
+          {isOutOfStock && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#EF4444', fontSize: '0.85rem', marginTop: '0.5rem' }}>
+              <AlertCircle size={15} /> Produk ini sedang habis terjual.
+            </div>
+          )}
 
           {product.store && (
             <div className="detail-store-card">

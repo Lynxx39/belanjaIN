@@ -1,5 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { readJSON, writeJSON, accountKeys, SESSION_KEY, GUEST_ID, migrateLegacy } from '../utils/storage';
+import { STATUS, STATUS_FLOW, STATUS_LABEL } from '../constants/status';
+
+export { STATUS, STATUS_FLOW, STATUS_LABEL };
 
 const AccountContext = createContext();
 
@@ -7,53 +10,86 @@ export const useAccount = () => useContext(AccountContext);
 
 const makeId = (prefix) => `${prefix}-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 
-export const STATUS = {
-  MENUNGGU_PEMBAYARAN: 'menunggu_pembayaran',
-  DIKEMAS: 'dikemas',
-  DIKIRIM: 'dikirim',
-  SELESAI: 'selesai',
-  DIBATALKAN: 'dibatalkan',
-};
-
-export const STATUS_FLOW = [STATUS.MENUNGGU_PEMBAYARAN, STATUS.DIKEMAS, STATUS.DIKIRIM, STATUS.SELESAI];
-
-export const STATUS_LABEL = {
-  [STATUS.MENUNGGU_PEMBAYARAN]: 'Menunggu Pembayaran',
-  [STATUS.DIKEMAS]: 'Dikemas',
-  [STATUS.DIKIRIM]: 'Dikirim',
-  [STATUS.SELESAI]: 'Selesai',
-  [STATUS.DIBATALKAN]: 'Dibatalkan',
-};
-
 export const AccountProvider = ({ children }) => {
   const [account, setAccount] = useState(() => {
     migrateLegacy();
     return readJSON(SESSION_KEY, null);
   });
-  const [addresses, setAddresses] = useState([]);
-  const [orders, setOrders] = useState([]);
+
   const userId = account?.id || GUEST_ID;
   const keys = accountKeys(userId);
-  const [hydratedFor, setHydratedFor] = useState(null);
 
-  useEffect(() => {
+  const [addresses, setAddresses] = useState(() => readJSON(accountKeys(userId).addresses, []));
+  const [orders, setOrders] = useState(() => readJSON(accountKeys(userId).orders, []));
+  const [prevUserId, setPrevUserId] = useState(userId);
+
+  // Synchronize state when userId changes (e.g. login/logout) during render
+  if (prevUserId !== userId) {
+    setPrevUserId(userId);
     setAddresses(readJSON(accountKeys(userId).addresses, []));
     setOrders(readJSON(accountKeys(userId).orders, []));
-    setHydratedFor(userId);
-  }, [userId]);
+  }
 
   useEffect(() => {
-    if (hydratedFor !== userId) return;
     writeJSON(keys.addresses, addresses);
-  }, [addresses, hydratedFor, userId, keys.addresses]);
+  }, [addresses, keys.addresses]);
 
   useEffect(() => {
-    if (hydratedFor !== userId) return;
     writeJSON(keys.orders, orders);
-  }, [orders, hydratedFor, userId, keys.orders]);
+  }, [orders, keys.orders]);
 
   const login = ({ name, phone }) => {
-    const next = { id: makeId('u'), name: name.trim(), phone: phone.trim() };
+    const cleanName = String(name || '').trim();
+    const cleanPhone = String(phone || '').trim();
+    if (!cleanName || !cleanPhone) return null;
+
+    const next = { id: makeId('u'), name: cleanName, phone: cleanPhone };
+    const guestKeys = accountKeys(GUEST_ID);
+    const userKeys = accountKeys(next.id);
+
+    // Migrate guest cart to logged-in user
+    const guestCart = readJSON(guestKeys.cart, []);
+    if (guestCart.length > 0) {
+      const userCart = readJSON(userKeys.cart, []);
+      const mergedCart = [...userCart];
+      for (const item of guestCart) {
+        const existIdx = mergedCart.findIndex((m) => m.cartItemId === item.cartItemId);
+        if (existIdx >= 0) {
+          const maxStock = mergedCart[existIdx].product?.stock ?? 9999;
+          mergedCart[existIdx].quantity = Math.min(mergedCart[existIdx].quantity + item.quantity, maxStock);
+        } else {
+          mergedCart.push(item);
+        }
+      }
+      writeJSON(userKeys.cart, mergedCart);
+      writeJSON(guestKeys.cart, []);
+    }
+
+    // Migrate guest wishlist
+    const guestWishlist = readJSON(guestKeys.wishlist, []);
+    if (guestWishlist.length > 0) {
+      const userWishlist = readJSON(userKeys.wishlist, []);
+      const mergedWishlist = Array.from(new Set([...userWishlist, ...guestWishlist]));
+      writeJSON(userKeys.wishlist, mergedWishlist);
+      writeJSON(guestKeys.wishlist, []);
+    }
+
+    // Migrate guest addresses
+    const guestAddresses = readJSON(guestKeys.addresses, []);
+    if (guestAddresses.length > 0) {
+      const userAddresses = readJSON(userKeys.addresses, []);
+      writeJSON(userKeys.addresses, [...userAddresses, ...guestAddresses]);
+      writeJSON(guestKeys.addresses, []);
+    }
+
+    // Migrate guest orders
+    const guestOrders = readJSON(guestKeys.orders, []);
+    if (guestOrders.length > 0) {
+      const userOrders = readJSON(userKeys.orders, []);
+      writeJSON(userKeys.orders, [...guestOrders, ...userOrders]);
+      writeJSON(guestKeys.orders, []);
+    }
+
     setAccount(next);
     writeJSON(SESSION_KEY, next);
     return next;
@@ -71,7 +107,11 @@ export const AccountProvider = ({ children }) => {
   const saveAddress = (address) => {
     setAddresses((prev) => {
       if (address.id) {
-        return prev.map((a) => (a.id === address.id ? { ...a, ...address } : a));
+        const next = prev.map((a) => (a.id === address.id ? { ...a, ...address } : a));
+        if (address.isDefault) {
+          return next.map((a) => ({ ...a, isDefault: a.id === address.id }));
+        }
+        return next;
       }
       const created = { ...address, id: makeId('addr') };
       const next = [...prev, created];
@@ -133,7 +173,16 @@ export const AccountProvider = ({ children }) => {
   };
 
   const cancelOrder = (orderId) => {
-    setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, status: STATUS.DIBATALKAN } : o)));
+    setOrders((prev) =>
+      prev.map((o) => {
+        if (o.id !== orderId) return o;
+        // Only allow cancellation for unpaid or pending packing orders
+        if (o.status !== STATUS.MENUNGGU_PEMBAYARAN && o.status !== STATUS.DIKEMAS) {
+          return o;
+        }
+        return { ...o, status: STATUS.DIBATALKAN };
+      })
+    );
   };
 
   const getOrder = (orderId) => orders.find((o) => o.id === orderId);
