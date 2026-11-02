@@ -23,8 +23,9 @@ export const ChatDrawer = () => {
   ];
 
   const handleSendMessage = (textToSend) => {
-    const query = textToSend || inputMsg;
-    if (!query.trim()) return;
+    const raw = (textToSend || inputMsg || '').trim();
+    if (!raw) return;
+    const query = raw.slice(0, 500);
 
     setMessages((prev) => [...prev, { id: Date.now(), sender: 'user', text: query }]);
     setInputMsg('');
@@ -79,6 +80,7 @@ export const ChatDrawer = () => {
             type="text"
             placeholder="Ketik pesan..."
             value={inputMsg}
+            maxLength={500}
             onChange={(e) => setInputMsg(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter') handleSendMessage();

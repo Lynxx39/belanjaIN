@@ -5,6 +5,7 @@ import { filterProducts, sortProducts } from './catalog.js';
 import { voucherDiscount, isEligible } from './coupon.js';
 import { groupByStore } from './shipping.js';
 import { addressForm, phone } from './validate.js';
+import { STATUS, STATUS_FLOW, STATUS_LABEL } from '../constants/status.js';
 
 const sample = [
   { id: 1, name: 'Murah', category: 'gadget', price: 100, discount: 10, freeShipping: true, rating: 4.9, soldCount: 10 },
@@ -59,5 +60,9 @@ assert.equal(addressForm({ name: '', phone: '081234567890', detail: 'x' }).ok, f
 assert.equal(addressForm({ name: 'Budi', phone: '081', detail: 'x' }).ok, false);
 assert.equal(addressForm({ name: 'Budi', phone: '081234567890', detail: 'Jl. Mawar' }).ok, true);
 assert.equal(phone('+62 812-3456-7890').ok, true);
+
+// Verify status flow consistency
+assert.equal(STATUS_FLOW.includes(STATUS.MENUNGGU_PEMBAYARAN), true);
+assert.equal(STATUS_LABEL[STATUS.SELESAI], 'Selesai');
 
 console.log('selfcheck OK');
