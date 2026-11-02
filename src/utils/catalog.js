@@ -8,8 +8,21 @@ export const sortProducts = (list, sortBy) => {
 };
 
 export const filterProducts = (list, opts = {}) => {
-  const { q = '', category = 'all', minPrice = '', maxPrice = '', onlyDiscount = false, onlyFreeShipping = false, minRating = 0, location = '' } = opts;
+  const {
+    q = '',
+    category = 'all',
+    minPrice = '',
+    maxPrice = '',
+    onlyDiscount = false,
+    onlyFreeShipping = false,
+    minRating = 0,
+    location = '',
+  } = opts;
+
   const query = q.trim().toLowerCase();
+  const min = minPrice !== '' && !isNaN(Number(minPrice)) ? Math.max(0, Number(minPrice)) : null;
+  const max = maxPrice !== '' && !isNaN(Number(maxPrice)) ? Math.max(0, Number(maxPrice)) : null;
+  const ratingThreshold = Number(minRating) || 0;
 
   return list.filter((p) => {
     if (query) {
@@ -17,11 +30,11 @@ export const filterProducts = (list, opts = {}) => {
       if (!haystack.includes(query)) return false;
     }
     if (category && category !== 'all' && p.category !== category) return false;
-    if (minPrice !== '' && p.price < Number(minPrice)) return false;
-    if (maxPrice !== '' && p.price > Number(maxPrice)) return false;
+    if (min !== null && p.price < min) return false;
+    if (max !== null && p.price > max) return false;
     if (onlyDiscount && p.discount <= 0) return false;
     if (onlyFreeShipping && !p.freeShipping) return false;
-    if (minRating && p.rating < Number(minRating)) return false;
+    if (ratingThreshold > 0 && p.rating < ratingThreshold) return false;
     if (location && !(p.store?.location || p.location || '').toLowerCase().includes(location.toLowerCase())) return false;
     return true;
   });

@@ -120,9 +120,31 @@ export const Account = () => {
                 <input className="field-input" value={addrForm.detail} onChange={(e) => setAddrForm({ ...addrForm, detail: e.target.value })} placeholder="Jalan, kelurahan, kota, kode pos" />
               </div>
             </div>
+            <div style={{ marginTop: '0.6rem' }}>
+              <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={addrForm.isDefault || addresses.length === 0}
+                  disabled={addresses.length === 0}
+                  onChange={(e) => setAddrForm({ ...addrForm, isDefault: e.target.checked })}
+                />
+                <span>Jadikan Alamat Pengiriman Utama</span>
+              </label>
+            </div>
             <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
               <button className="btn-primary" type="submit"><Check size={15} /> Simpan</button>
-              {addresses.length > 0 && <button type="button" className="btn-secondary" onClick={() => setEditing(false)}>Batal</button>}
+              {addresses.length > 0 && (
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => {
+                    setEditing(false);
+                    setAddrForm(emptyAddress);
+                  }}
+                >
+                  Batal
+                </button>
+              )}
             </div>
           </form>
         )}
