@@ -3504,3 +3504,357 @@ button, input, select, textarea {
     align-items: flex-start;
   }
 }
+
+/* ==========================================================================
+   Interactive Animated Mascot ("Si Belanja") & High-Craft Visual Enhancements
+   ========================================================================== */
+
+/* Mascot Container & Positioning */
+.mascot-container {
+  position: fixed;
+  bottom: 5.85rem;
+  right: 2rem;
+  z-index: 41;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.6rem;
+  pointer-events: auto;
+  user-select: none;
+}
+
+@media (max-width: 768px) {
+  .mascot-container {
+    bottom: calc(132px + env(safe-area-inset-bottom, 0px));
+    right: 1rem;
+    gap: 0.4rem;
+  }
+}
+
+/* Mascot SVG and Animations */
+.mascot-avatar-wrap {
+  cursor: pointer;
+  position: relative;
+  width: 74px;
+  height: 78px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+  border-radius: var(--radius-full);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mascot-avatar-wrap:hover {
+  transform: scale(1.08) translateY(-2px);
+}
+
+.mascot-avatar-wrap:focus-visible {
+  box-shadow: 0 0 0 3px var(--primary-light), 0 0 16px rgba(238, 77, 45, 0.5);
+}
+
+.mascot-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 8px 16px rgba(238, 77, 45, 0.25));
+}
+
+/* Floating & Breathing Physics */
+.mascot-body,
+.mascot-face-screen,
+.mascot-handle {
+  animation: mascotFloat 3.4s ease-in-out infinite;
+  transform-origin: 50% 90%;
+}
+
+.mascot-svg-shadow {
+  animation: mascotShadow 3.4s ease-in-out infinite;
+  transform-origin: 50px 98px;
+}
+
+/* Periodic Eye Blink */
+.mascot-eyes {
+  animation: mascotBlink 4.2s infinite;
+  transform-origin: 50px 56px;
+}
+
+/* Friendly Hand Wave */
+.mascot-waving-hand {
+  animation: mascotWave 2.2s ease-in-out infinite alternate;
+  transform-origin: 83px 52px;
+}
+
+/* Happy Cheering Jump on Cart Add or Click */
+.mascot-container.is-excited .mascot-avatar-wrap {
+  animation: mascotCheer 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) 2;
+}
+
+@keyframes mascotFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes mascotShadow {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.28;
+  }
+  50% {
+    transform: scale(0.78);
+    opacity: 0.14;
+  }
+}
+
+@keyframes mascotBlink {
+  0%, 94%, 100% {
+    transform: scaleY(1);
+  }
+  97% {
+    transform: scaleY(0.1);
+  }
+}
+
+@keyframes mascotWave {
+  0% {
+    transform: rotate(-8deg);
+  }
+  100% {
+    transform: rotate(24deg) translateY(-2px);
+  }
+}
+
+@keyframes mascotCheer {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  40% {
+    transform: translateY(-16px) scale(1.12) rotate(-5deg);
+  }
+  70% {
+    transform: translateY(-4px) scale(1.05) rotate(4deg);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Mascot Speech Bubble */
+.mascot-bubble {
+  position: relative;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 0.85rem 1rem;
+  max-width: 290px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  animation: bubbleFadeIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-origin: bottom right;
+}
+
+@keyframes bubbleFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.85) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.mascot-bubble-tail {
+  position: absolute;
+  bottom: -7px;
+  right: 28px;
+  width: 14px;
+  height: 14px;
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  transform: rotate(45deg);
+}
+
+.mascot-bubble-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.45rem;
+}
+
+.mascot-bubble-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--primary);
+  background: rgba(238, 77, 45, 0.1);
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-full);
+}
+
+.mascot-bubble-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.mascot-icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+}
+
+.mascot-icon-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-main);
+}
+
+.mascot-bubble-text {
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.45;
+  margin: 0 0 0.6rem 0;
+}
+
+.mascot-bubble-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.mascot-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.mascot-action-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.mascot-action-btn.copy-code-btn {
+  background: rgba(238, 77, 45, 0.08);
+  border-color: rgba(238, 77, 45, 0.3);
+  color: var(--primary);
+}
+
+/* Minimized Mascot Pill */
+.mascot-minimized-pill {
+  position: fixed;
+  bottom: 5.85rem;
+  right: 2rem;
+  z-index: 41;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 0.4rem 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-main);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@media (max-width: 768px) {
+  .mascot-minimized-pill {
+    bottom: calc(130px + env(safe-area-inset-bottom, 0px));
+    right: 1rem;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.7rem;
+  }
+}
+
+.mascot-minimized-pill:hover {
+  transform: translateY(-2px) scale(1.04);
+  border-color: var(--primary);
+}
+
+.mascot-mini-pulse {
+  width: 6px;
+  height: 6px;
+  background: var(--primary);
+  border-radius: var(--radius-full);
+  animation: pulse 1.8s infinite;
+}
+
+/* Modern Card Glow & Hover Lift */
+.product-card {
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.28s ease, border-color 0.25s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.12);
+  border-color: rgba(238, 77, 45, 0.35);
+}
+
+.product-image-wrap {
+  overflow: hidden;
+}
+
+.product-image-wrap img {
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.product-card:hover .product-image-wrap img {
+  transform: scale(1.045);
+}
+
+/* Subtle Shimmer for Official & Star+ Badges */
+.card-badge-official,
+.card-badge-star-plus {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  letter-spacing: 0.02em;
+}
+
+/* Active Mobile Bottom Nav Bounce */
+.bottom-nav-item.active .bottom-nav-icon-wrap {
+  transform: translateY(-2px);
+  color: var(--primary);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bottom-nav-item.active .bottom-nav-label {
+  color: var(--primary);
+  font-weight: 800;
+}
+
+/* Tactile Button Feedback */
+button:active:not(:disabled) {
+  transform: scale(0.975);
+}
+

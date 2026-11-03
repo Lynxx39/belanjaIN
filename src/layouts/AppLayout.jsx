@@ -5,6 +5,7 @@ import { Footer } from '../components/Footer';
 import { BottomNav } from '../components/BottomNav';
 import { ToastContainer } from '../components/ToastContainer';
 import { ChatDrawer } from '../components/ChatDrawer';
+import { Mascot } from '../components/Mascot';
 import { MessageSquare } from 'lucide-react';
 import { useUi } from '../context/UiContext';
 
@@ -20,6 +21,7 @@ export const AppLayout = ({ children }) => {
       <Footer />
       <ToastContainer />
       <ChatDrawer />
+      <Mascot onOpenChat={() => setIsChatOpen(true)} />
       <button className="floating-assistant-btn" onClick={() => setIsChatOpen(true)} aria-label="Chat penjual">
         <MessageSquare size={18} />
         <span>Chat Penjual</span>

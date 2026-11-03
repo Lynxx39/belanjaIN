@@ -50,4 +50,14 @@ export const vouchers = [
     maxDiscount: 50000,
     description: 'Voucher khusus toko TechHub Official. Min. belanja Rp 300RB.',
   },
+  {
+    code: 'SIBELANJA10',
+    title: 'Diskon 10% Spesial Si Belanja',
+    scope: 'platform',
+    minSpend: 50000,
+    discountType: 'percent',
+    discountValue: 10,
+    maxDiscount: 35000,
+    description: 'Voucher rahasia maskot Si Belanja! Diskon 10% s/d Rp 35.000 min. belanja Rp 50.000.',
+  },
 ];

@@ -48,7 +48,16 @@ export const ProductCard = ({ product, isFlashSaleItem = false }) => {
       }}
     >
       <div className="product-image-wrap">
-        <img src={product.images[0]} alt={product.name} className="product-image" loading="lazy" />
+        <img
+          src={product.images[0]}
+          alt={product.name}
+          className="product-image"
+          loading="lazy"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" fill="%23f1f5f9"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2394a3b8" font-family="sans-serif" font-size="14">Gambar Produk</text></svg>';
+          }}
+        />
 
         {product.badge === 'Official Store' ? (
           <div className="card-badge-official">

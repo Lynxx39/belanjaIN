@@ -77,7 +77,15 @@ export const ProductDetail = () => {
 
       <div className="detail-layout">
         <div className="detail-gallery">
-          <img src={product.images[activeImgIndex] || product.images[0]} alt={product.name} className="gallery-main-img" />
+          <img
+            src={product.images[activeImgIndex] || product.images[0]}
+            alt={product.name}
+            className="gallery-main-img"
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600"><rect width="600" height="600" fill="%23f1f5f9"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2394a3b8" font-family="sans-serif" font-size="20">Gambar Produk</text></svg>';
+            }}
+          />
           <div className="gallery-thumbs">
             {product.images.map((img, idx) => (
               <button key={idx} className={`gallery-thumb-btn ${activeImgIndex === idx ? 'active' : ''}`} onClick={() => setActiveImgIndex(idx)} aria-label={`Gambar ${idx + 1}`}>
